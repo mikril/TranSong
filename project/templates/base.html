@@ -1,0 +1,53 @@
+{# templates/base.html #}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link href="https://fonts.googleapis.com/css?family=Raleway:900" rel="stylesheet">
+  <script src="{{ url_for('static', filename='theme.js') }}"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='theme.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <title>{% block title %}{{ title }}{% endblock title %}</title>
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  
+  <header>
+    <nav>
+      <ul>
+        <li><a href="../../home">Главная</a></li>
+        <li><a href="../../create_compilation">Создать</a></li>
+        <li><a href="../../compilations">Подборки</a></li>
+      </ul>
+    </nav>
+    <div class="logo">
+      <a href="../../compilations"><img style="width: 200px;" src="{{ url_for('static', filename='logo.png') }}"></a>
+    </div>
+    
+    <div class="login-block">
+      {% if isLogged %}
+      <a class="login-btn" href="../profile">Привет, {{username}}!</a>
+      {% else %}
+      <a class="login-btn" href="../login">Войти</a>
+      {% endif %}
+    </div>
+  </header>	
+  <main>
+  {% block content %}
+  {% endblock content %}
+</main>
+<footer>
+  <div class="container">
+    © 2023 TRANSONG.RU, ALL RIGHTS RESERVED.
+  </div>
+</footer>
+</body>
+</html>
+

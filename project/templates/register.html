@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 style="text-align: center;">Зарегистрироваться</h1>
+<div class="container register">
+    {% for msg in get_flashed_messages() %}
+    <div class="flash">{{msg}}</div>
+    {% endfor %}
+
+    <form class="reg-form" action="/register" method="post" class="form-contact">
+        <input placeholder="Имя пользователя" class="input-field" type="text" name="name" value="" required />
+        <input placeholder="Email" class="input-field" type="email" name="email" value="" required />
+        <input placeholder="Пароль" class="input-field" type="password" name="psw" value="" required />
+        <input placeholder="Повторите пароль" class="input-field" type="password" name="psw2" value="" required />
+        <input class="submit-btn" type="submit" value="Зарегистрироваться" />
+    </form>
+</div>
+{% endblock %}

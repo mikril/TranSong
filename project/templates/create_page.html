@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container create-page">
+    <h2>Создайте СВОЮ подборку!</h2>
+    <form id="send-form" class="upload-form playListForm" action="../upload_compilation" method="POST">
+        <button style="margin-bottom: 10px;" class="submit-btn Send" type="submit" value="Send">Подтвердить</button>
+        <div>
+            <input class="input-field form-input" placeholder="Имя подборки" type="text" name="name" id="name" maxlength="25" required>
+            <input class="input-field form-input" placeholder="Ссылка на обложку" type="text" name="photo_url" id="photo_url" required>
+        </div>
+        <div>
+             <div style="display: grid;">
+            <input style="margin-bottom: 0;" class="input-field form-input" pattern="https:\/\/genius\.com\/.+" placeholder="Ссылка на песню" type="text" name="songs" id="songs">
+            <samll style="display: block;text-align: end; font-size: small; color:gray;">Ввод через ENTER</samll>
+                 <samll style="display: block;text-align: end; font-size: small; color:gray;">Используйте ссылки с <a href="https://genius.com" style="color: #007c89">genius.com</a></samll>
+             </div>
+            <div style="display: grid;">
+            <input style="margin-bottom: 0;" class="input-field form-input" id="tags" placeholder="Теги (максимум 3)" name="tags" id="tags" maxlength="15">
+            <samll style="display: block;text-align: end;font-size: small; color:gray;">Ввод через ENTER</samll>
+            </div>
+        </div>
+    </form>     
+    <div class = 'lists'>
+        <div class = 'lists1'><form class="songsList"></form></div>
+        <div class = 'lists2'><form class="tagsList"></form></div>
+    </div>
+</div>
+<script type="text/javascript" src="{{ url_for('static', filename='form-script.js') }}"></script>
+{% endblock content %}

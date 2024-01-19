@@ -1,0 +1,36 @@
+{# templates/main.html #}
+
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="filter-div">
+    <form class="filter-form" action="" method="get">
+        <p style="margin-bottom: 0;">Поиск по тегам</p>
+      <input placeholder="Тег" id="tag-input1" class="input-field form-input" type="text" name="filter" id="filter" >
+        <samll style="display: block; font-size: small; color:gray;">Ввод через ENTER</samll>
+      <button class="submit-btn filter-btn">ПРИМЕНИТЬ</button>
+    </form>
+  </div>
+  <div class="card-list">
+    {% for compilation in compilations %}
+    <a href="play/{{compilation[1]}}">
+      <div class="card" style="background-image: url({{compilation[2]}})">
+        <p class="author">{{compilation[3]}}</p>
+        <p class="card-text">{{compilation[0]}}</p>
+        <p class="songs-amount">Песен: {{get_songs_amount(compilation[4])}}</p>
+        <div class="tag-list">
+          {% for tag in get_tags_from_str(compilation[5]) %}
+            <span class="tag">{{tag}}</span>
+          {% endfor %}
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+    <a href="create_compilation">
+      <div class="card create-comiplation" style="background-image: url({{url_for('static', filename='cross.png')}});">
+        <p class="card-text">СОЗДАТЬ СВОЮ</p>
+      </div>
+    </a>
+  </div>
+  <script type="text/javascript" src="{{ url_for('static', filename='filter-script.js') }}"></script>
+{% endblock content %}

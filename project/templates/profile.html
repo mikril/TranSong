@@ -1,0 +1,32 @@
+{# templates/main.html #}
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container profile">
+<h1>Привет, {{current_user.get_name()}}!</h1> 
+<p class="info">ID: {{current_user.get_id()}}</p>
+<p class="info">EMAIL: {{current_user.get_email()}}</p>
+<a href="{{url_for('logout')}}"><button class="submit-btn logout-btn">Выйти</button></a>
+
+</div>
+<h2>Твои подборки:</h2>
+  <div class="card-list">
+    {% for compilation in compilations %}
+    <div>
+      <div class="card" style="background-image: url({{compilation[2]}})">
+        <a href="../../delete_compilation/{{compilation[1]}}" class="delete-compilation-btn">✖</a>
+        <p class="author">{{compilation[3]}}</p>
+        <p class="card-text"><a class="card-link" href="../play/{{compilation[1]}}">{{compilation[0]}}</a></p>
+        <p class="songs-amount">Песен: {{get_songs_amount(compilation[4])}}</p>
+        <div class="tag-list">
+          {% for tag in get_tags_from_str(compilation[5]) %}
+            <span class="tag">{{tag}}</span>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+{% endblock content %}

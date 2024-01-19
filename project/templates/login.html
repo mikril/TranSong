@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1 style="text-align: center;">Log in</h1>
+<div class="container register">
+{% for msg in get_flashed_messages() %}
+<div class="flash">{{msg}}</div>
+{% endfor %}
+
+<form action="" method="post" class="reg-form">
+    <input placeholder="Email" class="input-field" type="email" name="email" value="" required />
+    <input placeholder="Пароль" class="input-field" type="password" name="psw" value="" required />
+    <div class="remainme"><input type="checkbox" name="remainme" /> Запомнить меня </div>
+    <input class="submit-btn" type="submit" value="Логин" />
+</form>
+<a class="reg-form" href="{{url_for('register')}}"><button class="submit-btn sign-btn">Зарегистрироваться</button></a>
+</div>
+{% endblock %}

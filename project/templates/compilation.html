@@ -1,0 +1,256 @@
+
+{# templates/compilation.html #}
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card-opened" style="background-image: url({{compilation.photo_url}})">
+    <p class="author">{{compilation["author"]}}</p>
+    <p class="card-text">{{compilation["name"]}}</p>
+    <p class="songs-amount">Songs: {{get_songs_amount(compilation["songs"])}}</p>
+    <div class="tag-list">
+      {% for tag in get_tags_from_str(compilation["tags"]) %}
+        <span class="tag">{{tag}}</span>
+      {% endfor %}
+    </div>
+  </div>
+<div class="container">
+<h1 class="heading">Добро пожаловать на {{ compilation["name"] }}!</h1>
+<div class = "text-answer">
+    <p class="content"></p>
+    <form class="answer" style="display: none">
+        <div>
+        <input  type="text" class="songName input-field" placeholder="Введите название трека">
+        <input  type="text" class="authorName input-field" placeholder="Введите авторов, через запятую">
+        <input  type="button" value="Проверить" class="check-btn submit-btn">
+        <input  type="button" value="Продолжить" class="continue-btn submit-btn" style="display: none">
+        </div>
+    </form>
+</div>
+<form class="levels">
+  <h2>Выберите сложность</h2>
+  <div class="difficults">
+      <div class="difficult-select">
+          <input type="radio" class="difficultyLevel1" id="easy" name="level" value="easy" checked>
+          <label class="radio" for="easy">Легкая</label>
+      </div>
+      <div class="difficult-select">
+          <input type="radio" class="difficultyLevel2" id="medium" name="level" value="medium">
+          <label class="radio" for="medium">Средняя</label>
+      </div>
+      <div class="difficult-select">
+          <input type="radio" class="difficultyLevel3" id="difficult" name="level" value="difficult">
+          <label class="radio" for="difficult">Сложная</label>
+      </div>
+  </div>
+</form>
+<button class="start-btn submit-btn">Старт</button>
+<button class="back-compilations-btn submit-btn" style="display: none">Вернуться к подборкам</button>
+</div>
+<script>
+
+    async function fetchAsync (url) {
+        let response = await fetch(url);
+        let data = await response.json();
+        return data;
+    }
+
+    function calculateTextSimilarity(text1, text2) {
+      var longerText = text1.length > text2.length ? text1 : text2;
+      var shorterText = text1.length > text2.length ? text2 : text1;
+      var longerLength = longerText.length;
+
+      var distance = levenshteinDistance(longerText, shorterText);
+      var similarity = (longerLength - distance) / longerLength * 100;
+
+      return similarity.toFixed(2); // Округляем до двух знаков после запятой
+    }
+    function levenshteinDistance(text1, text2) {
+      var matrix = [];
+
+      var n = text1.length;
+      var m = text2.length;
+
+      if (n === 0) return m;
+      if (m === 0) return n;
+
+      for (var i = 0; i <= n; i++) {
+        matrix[i] = [i];
+      }
+
+      for (var j = 0; j <= m; j++) {
+        matrix[0][j] = j;
+      }
+
+      for (var i = 1; i <= n; i++) {
+        for (var j = 1; j <= m; j++) {
+          if (text1.charAt(i - 1) === text2.charAt(j - 1)) {
+            matrix[i][j] = matrix[i - 1][j - 1];
+          } else {
+            var deletion = matrix[i - 1][j] + 1;
+            var insertion = matrix[i][j - 1] + 1;
+            var substitution = matrix[i - 1][j - 1] + 1;
+
+            matrix[i][j] = Math.min(deletion, insertion, substitution);
+          }
+        }
+      }
+
+      return matrix[n][m];
+    }
+
+    function changeLevel (difficultyLevel,data) {
+        switch(difficultyLevel) {
+            case 'easy':
+
+                 textSong=""
+                 for (var i of JSON.parse(data.translated_parts)){
+                     textSong+=i['text'].replaceAll("[","").replaceAll("]","")+"<br>"
+                 }
+                 return textSong
+                 break
+
+            case 'medium':
+
+                 for (var i of JSON.parse(data.translated_parts)){
+                     if (i['type']=='chorus')
+                         return i['text']
+
+
+                 }
+                 textSong=""
+                 for (var i of JSON.parse(data.translated_parts)){
+                     textSong+=i['text']+"<br>"
+                 }
+                 return textSong
+                 break
+
+
+            case 'difficult':
+
+                 for (var i of JSON.parse(data.translated_parts)){
+                     if (i['type']=='verse')
+                         return i['text']
+
+                 }
+                 textSong=""
+                 for (var i of JSON.parse(data.translated_parts)){
+                     textSong+=i['text']+"<br>"
+                 }
+                 return textSong
+                 break
+            default:
+                return 'Нет текста'
+        }
+
+    }
+
+    score=0
+    songs_id = {{compilation.songs_id}};
+    current_song = 0;
+    difficultyLevel="";
+    content="";
+    song_name_block = document.getElementsByClassName("songName")[0];
+    author_name_block = document.getElementsByClassName("authorName")[0];
+    answer_block = document.getElementsByClassName("answer")[0];
+    continue_block = document.getElementsByClassName("continue-btn")[0];
+    check_block = document.getElementsByClassName("check-btn")[0];
+    start_block = document.getElementsByClassName("start-btn")[0];
+    text_bloc= document.getElementsByClassName("content")[0];
+    head_block = document.getElementsByClassName("heading")[0];
+    change_levels = document.getElementsByClassName("levels")[0];
+    compilations_btn = document.getElementsByClassName("back-compilations-btn")[0];
+
+
+    start_block.onclick = function ()
+    {
+        difficultyLevel = document.querySelector("input[type='radio'][name='level']:checked").value
+        change_levels.style.display='none'
+        head_block.textContent="Вы на "+(current_song+1)+" песне"
+        song = fetchAsync("../get_song/"+songs_id[current_song])
+        song.then(function(data) {
+
+            content=changeLevel(difficultyLevel,data);
+
+            text_bloc.innerHTML=content.replaceAll("\n", '<br>');
+        })
+        start_block.style.display="none"
+        answer_block.style.display="unset"
+    };
+
+    check_block.onclick = function ()
+    {
+
+        song.then(function(data) {
+
+            console.log(data)
+            if (calculateTextSimilarity(song_name_block.value.toLowerCase(),data.name.toLowerCase().split(" (")[0])>70){
+                score+=100*1/songs_id.length/2
+                song_name_block.style.backgroundColor="#659157"
+            }
+            else{
+                 song_name_block.style.backgroundColor="#FE4A49"}
+
+            authors=[...eval(data.author),...eval(data.featuring)].map(function(element) {return element.toLowerCase().replaceAll("\u200b","").split(" (")[0].replaceAll(" ","");});
+            console.log(authors)
+            answer_authors=author_name_block.value.toLowerCase().replaceAll(" ","").split(",")
+            console.log(answer_authors)
+
+            var count = 0;
+            for (var i = 0; i < authors.length; i++) {
+                for (var j = 0; j < answer_authors.length; j++) {
+
+                    if (calculateTextSimilarity(answer_authors[j],authors[i])>85) {
+                      count++;
+                      break;
+                    }
+              }
+            }
+
+            if (authors.length==count){
+                score+=100*1/songs_id.length/2
+                author_name_block.style.backgroundColor="#659157"
+            }
+            else if(count>0){
+                score+=100*(count/authors.length)/songs_id.length/2
+                author_name_block.style.backgroundColor="#EFCB68";
+            }
+            else{
+                 author_name_block.style.backgroundColor="#FE4A49";
+                }
+
+            })
+        check_block.style.display="none"
+        continue_block.style.display="unset"
+    }
+     continue_block.onclick = function ()
+    {
+
+        if (current_song<songs_id.length-1){
+            song_name_block.value=""
+            author_name_block.value=""
+            song_name_block.style.backgroundColor="white"
+            author_name_block.style.backgroundColor="white"
+            current_song+=1
+            head_block.textContent="Вы на "+(current_song+1)+" песне"
+            song = fetchAsync("../get_song/"+songs_id[current_song])
+            song.then(function(data) {
+                content=changeLevel(difficultyLevel,data);
+                text_bloc.innerHTML=content.replaceAll("\n", '<br>');
+            })
+            check_block.style.display="unset"
+            continue_block.style.display="none"}
+        else{
+            head_block.innerHTML="Подборка подошла к концу <br> <br> Ваш счёт: " + Math.round(score * 100) / 100 +"%"
+            text_bloc.innerHTML=""
+            answer_block.style.display="none"
+            compilations_btn.style.display = 'block'}
+
+    };
+
+    compilations_btn.onclick = function ()
+    {
+        window.location.href = '../../compilations';
+    }
+</script>
+{% endblock content %}
